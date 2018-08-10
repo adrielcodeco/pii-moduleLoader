@@ -6,6 +6,7 @@ module.exports = {
   collectCoverageFrom: ['src/**'],
   moduleFileExtensions: ['ts', 'js', 'json', 'node'],
   testRegex: '/.*\\.unit\\.[tj]s$',
+  testEnvironment: 'node',
   globals: {
     'ts-jest': {
       'skipBabel': true,
