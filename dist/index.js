@@ -1,17 +1,24 @@
 "use strict";
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
+    result["default"] = mod;
+    return result;
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-const path = require("path");
-const Module = module.constructor;
-class ModuleLoader {
-    constructor() {
+var path = __importStar(require("path"));
+var Module = module.constructor;
+var ModuleLoader = (function () {
+    function ModuleLoader() {
         this.aliases = [];
         this._resolveFilenameOld = Module._resolveFilename;
         this._loadOld = Module._load;
         Module._resolveFilename = this._resolveFilename.bind(this);
         Module._load = this._load.bind(this);
     }
-    useAlias(alias, path) {
-        const _alias = this.aliases.filter(a => {
+    ModuleLoader.prototype.useAlias = function (alias, path) {
+        var _alias = this.aliases.filter(function (a) {
             if (typeof alias === 'string' && typeof a.alias === 'string') {
                 return a.alias === alias;
             }
@@ -19,17 +26,17 @@ class ModuleLoader {
                 return a.alias.source === alias.source;
             }
             return false;
-        }).find(i => true);
+        }).find(function (i) { return true; });
         if (_alias) {
             _alias.path = path;
         }
         else {
-            this.aliases.push({ alias, path });
+            this.aliases.push({ alias: alias, path: path });
         }
-    }
-    resolvePath(request) {
-        const alias = this.aliases
-            .filter(a => {
+    };
+    ModuleLoader.prototype.resolvePath = function (request) {
+        var alias = this.aliases
+            .filter(function (a) {
             if (typeof a.alias === 'string') {
                 return a.alias === request;
             }
@@ -37,7 +44,7 @@ class ModuleLoader {
                 return a.alias.test(request);
             }
         })
-            .sort((a1, a2) => {
+            .sort(function (a1, a2) {
             if (typeof a1.alias === 'string' && typeof a2.alias === 'string') {
                 if (a1.alias.length < a2.alias.length)
                     return 1;
@@ -54,37 +61,37 @@ class ModuleLoader {
             }
             else if (typeof a1.alias !== 'string' &&
                 typeof a2.alias !== 'string') {
-                const r1 = a1.alias.exec(request);
-                const r2 = a2.alias.exec(request);
-                const rv1 = r1
-                    .sort((v1, v2) => (v1.length > v2.length ? 1 : -1))
-                    .find(() => true);
-                const rv2 = r2
-                    .sort((v1, v2) => (v1.length > v2.length ? 1 : -1))
-                    .find(() => true);
+                var r1 = a1.alias.exec(request);
+                var r2 = a2.alias.exec(request);
+                var rv1 = r1
+                    .sort(function (v1, v2) { return (v1.length > v2.length ? 1 : -1); })
+                    .find(function () { return true; });
+                var rv2 = r2
+                    .sort(function (v1, v2) { return (v1.length > v2.length ? 1 : -1); })
+                    .find(function () { return true; });
                 return rv1.length > rv2.length ? 1 : -1;
             }
             return 0;
         })
-            .find(() => true);
+            .find(function () { return true; });
         if (alias) {
-            let aliaspath;
+            var aliaspath = void 0;
             if (typeof alias.alias === 'string') {
                 aliaspath = alias.path;
             }
             else {
-                aliaspath = path.resolve(alias.path, `./${alias.alias.exec(request)[1]}`);
+                aliaspath = path.resolve(alias.path, "./" + alias.alias.exec(request)[1]);
             }
             return aliaspath;
         }
         return request;
-    }
-    _resolveFilename(request, parent, isMain, options) {
-        const aliaspath = this.resolvePath(request);
+    };
+    ModuleLoader.prototype._resolveFilename = function (request, parent, isMain, options) {
+        var aliaspath = this.resolvePath(request);
         return this._resolveFilenameOld(aliaspath, parent, isMain, options);
-    }
-    _load(request, parent, isMain) {
-        const _exports = this._loadOld(request, parent, isMain);
+    };
+    ModuleLoader.prototype._load = function (request, parent, isMain) {
+        var _exports = this._loadOld(request, parent, isMain);
         if (typeof _exports === 'object' &&
             Reflect.ownKeys(_exports).length > 0 &&
             (process.env.NODE_ENV || 'development') in _exports) {
@@ -96,9 +103,10 @@ class ModuleLoader {
             }
         }
         return _exports;
-    }
-}
-const moduleLoader = new ModuleLoader();
+    };
+    return ModuleLoader;
+}());
+var moduleLoader = new ModuleLoader();
 function resolvePath(path) {
     return moduleLoader.resolvePath(path);
 }
